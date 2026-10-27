@@ -75,8 +75,6 @@ python3 tests/agent-status/test_hooks.py
 
 当前构建不包含自动更新通道，也不会检查或安装旧项目的更新。
 
-## 许可证与来源
+## 许可证
 
-本项目基于 [TheBoredTeam/boring.notch](https://github.com/TheBoredTeam/boring.notch) 二次开发，并按 GPLv3 重新命名与修改。原始代码及其贡献者的版权归原作者所有；2026 年的品牌、界面与接入修改由 NIU-123370 完成。
-
-完整许可证见 [LICENSE](LICENSE)，第三方依赖许可见 [THIRD_PARTY_LICENSES](THIRD_PARTY_LICENSES)。本项目同样以 **GNU GPL v3** 发布。
+本项目以 **GNU GPL v3** 发布。完整许可证见 [LICENSE](LICENSE)，第三方依赖许可见 [THIRD_PARTY_LICENSES](THIRD_PARTY_LICENSES)，版权与修改声明见 [NOTICE](NOTICE)。
