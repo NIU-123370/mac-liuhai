@@ -1,0 +1,77 @@
+name: Fork Build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build unsigned app
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select newest Xcode
+        run: |
+          XCODE=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+          echo "Using $XCODE"
+          sudo xcode-select -s "$XCODE"
+          xcodebuild -version
+
+      - name: Test agent status adapters
+        run: |
+          swiftc -swift-version 5 \
+            macLiuhai/models/AgentSession.swift \
+            macLiuhai/managers/AgentStatusReader.swift \
+            tests/agent-status/main.swift -o /tmp/agent-status-tests
+          /tmp/agent-status-tests
+          python3 tests/agent-status/test_hooks.py
+
+      - name: Resolve packages
+        run: xcodebuild -resolvePackageDependencies -project macLiuhai.xcodeproj
+
+      - name: Build
+        run: |
+          xcodebuild build \
+            -project macLiuhai.xcodeproj \
+            -scheme macLiuhai \
+            -configuration Release \
+            -destination "generic/platform=macOS" \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=YES \
+            DEVELOPMENT_TEAM="" \
+            ONLY_ACTIVE_ARCH=NO
+
+      - name: Re-sign nested code ad-hoc
+        run: |
+          APP_PATH="build/Build/Products/Release/mac-liuhai.app"
+          codesign --force --deep --sign - "$APP_PATH"
+          codesign -dv "$APP_PATH" 2>&1 | grep -E 'flags|TeamIdentifier'
+
+      - name: Package
+        run: |
+          APP_PATH="build/Build/Products/Release/mac-liuhai.app"
+          test -d "$APP_PATH" || { echo "app not found"; ls -R build/Build/Products | head -50; exit 1; }
+          mkdir -p out
+          cp -R "$APP_PATH" out/
+          cd out
+          zip -qry "MacLiuhai-fork.zip" "mac-liuhai.app"
+          ls -lh
+
+      - name: Upload app
+        uses: actions/upload-artifact@v4
+        with:
+          name: MacLiuhai-fork
+          path: out/MacLiuhai-fork.zip
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: build/Logs
