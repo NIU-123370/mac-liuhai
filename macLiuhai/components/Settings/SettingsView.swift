@@ -110,6 +110,7 @@ struct SettingsView: View {
         .frame(width: 700)
         .background(Color(NSColor.windowBackgroundColor))
         .tint(.effectiveAccent)
+        .environment(\.locale, Locale(identifier: "zh-Hans"))
         .id(accentColorUpdateTrigger)
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("AccentColorChanged"))) { _ in
             accentColorUpdateTrigger = UUID()
@@ -172,7 +173,7 @@ struct GeneralSettings: View {
                     Text("Show menu bar icon")
                 }
                 .tint(.effectiveAccent)
-                LaunchAtLogin.Toggle("Launch at login")
+                LaunchAtLogin.Toggle("登录时启动")
                 Defaults.Toggle(key: .showOnAllDisplays) {
                     Text("Show on all displays")
                 }
@@ -524,7 +525,7 @@ struct HUD: View {
             Section {
                 Picker("Option key behaviour", selection: $optionKeyAction) {
                     ForEach(OptionKeyAction.allCases) { opt in
-                        Text(opt.rawValue).tag(opt)
+                        Text(LocalizedStringKey(opt.rawValue)).tag(opt)
                     }
                 }
                 
@@ -619,7 +620,7 @@ struct Media: View {
             Section {
                 Picker("Music Source", selection: $mediaController) {
                     ForEach(availableMediaControllers) { controller in
-                        Text(controller.rawValue).tag(controller)
+                        Text(LocalizedStringKey(controller.rawValue)).tag(controller)
                     }
                 }
                 .onChange(of: mediaController) { _, _ in
@@ -660,7 +661,7 @@ struct Media: View {
                 Toggle("Show sneak peek on playback changes", isOn: $enableSneakPeek)
                 Picker("Sneak Peek Style", selection: $sneakPeekStyles) {
                     ForEach(SneakPeekStyle.allCases) { style in
-                        Text(style.rawValue).tag(style)
+                        Text(LocalizedStringKey(style.rawValue)).tag(style)
                     }
                 }
                 HStack {
@@ -1197,7 +1198,7 @@ struct Appearance: View {
                 }
                 Picker("Slider color", selection: $sliderColor) {
                     ForEach(SliderColorEnum.allCases, id: \.self) { option in
-                        Text(option.rawValue)
+                        Text(LocalizedStringKey(option.rawValue))
                     }
                 }
             } header: {
@@ -1728,7 +1729,7 @@ struct Shortcuts: View {
     var body: some View {
         Form {
             Section {
-                KeyboardShortcuts.Recorder("Toggle Sneak Peek:", name: .toggleSneakPeek)
+                KeyboardShortcuts.Recorder("切换预览：", name: .toggleSneakPeek)
             } header: {
                 Text("Media")
             } footer: {
@@ -1740,7 +1741,7 @@ struct Shortcuts: View {
                 .font(.caption)
             }
             Section {
-                KeyboardShortcuts.Recorder("Toggle Notch Open:", name: .toggleNotchOpen)
+                KeyboardShortcuts.Recorder("切换刘海展开：", name: .toggleNotchOpen)
             }
         }
         .accentColor(.effectiveAccent)
@@ -1769,7 +1770,7 @@ func comingSoonTag() -> some View {
         .clipShape(.capsule)
 }
 
-func customBadge(text: String) -> some View {
+func customBadge(text: LocalizedStringKey) -> some View {
     Text(text)
         .foregroundStyle(.secondary)
         .font(.footnote.bold())

@@ -19,17 +19,17 @@ struct DynamicNotchApp: App {
 
     var body: some Scene {
         MenuBarExtra("mac-liuhai", systemImage: "sparkle", isInserted: $showMenuBarIcon) {
-            Button("Settings") {
+            Button("设置") {
                 DispatchQueue.main.async {
                     SettingsWindowController.shared.showWindow()
                 }
             }
             .keyboardShortcut(KeyEquivalent(","), modifiers: .command)
             Divider()
-            Button("Restart mac-liuhai") {
+            Button("重启 mac-liuhai") {
                 ApplicationRelauncher.restart()
             }
-            Button("Quit", role: .destructive) {
+            Button("退出", role: .destructive) {
                 NSApplication.shared.terminate(self)
             }
             .keyboardShortcut(KeyEquivalent("Q"), modifiers: .command)
