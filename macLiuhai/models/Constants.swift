@@ -178,8 +178,8 @@ extension Defaults.Keys {
     static let autoScrollToNextEvent = Key<Bool>("autoScrollToNextEvent", default: true)
     
     // MARK: Focus
-    static let pomodoroFocusMinutes = Key<Int>("pomodoroFocusMinutes", default: 25)
-    static let pomodoroBreakMinutes = Key<Int>("pomodoroBreakMinutes", default: 5)
+    static let pomodoroFocusMinutes = Key<Int>("pomodoroFocusMinutes", default: 50)
+    static let pomodoroBreakMinutes = Key<Int>("pomodoroBreakMinutes", default: 15)
     static let pomodoroStats = Key<PomodoroStats>("pomodoroStats", default: PomodoroStats())
 
     // MARK: Fullscreen Media Detection
