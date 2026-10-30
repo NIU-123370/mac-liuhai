@@ -12,7 +12,7 @@ mac-liuhai 是一个 macOS 菜单栏应用：音乐控制、播放可视化、�
 
 ## 产品演示
 
-[观看产品演示视频（31 秒）](docs/promo.mp4)
+https://github.com/user-attachments/assets/866eb92d-5b1f-4463-8cf4-558852aafa08
 
 ## 系统要求
 
