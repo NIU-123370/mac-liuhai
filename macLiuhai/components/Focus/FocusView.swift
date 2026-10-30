@@ -2,11 +2,19 @@ import SwiftUI
 
 struct FocusView: View {
     @ObservedObject var pomodoro = PomodoroManager.shared
+    @State private var hoveredDayID: String?
 
     private static let weekdayFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "EEEEE"
+        return formatter
+    }()
+
+    private static let dayFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "EEE, MMM d"
         return formatter
     }()
 
@@ -104,6 +112,12 @@ struct FocusView: View {
             }
 
             weekChart
+
+            Text(hoveredDayText)
+                .font(.system(size: 10, weight: .medium, design: .rounded))
+                .foregroundStyle(.white.opacity(0.75))
+                .frame(height: 12, alignment: .leading)
+                .opacity(hoveredDayID == nil ? 0 : 1)
         }
     }
 
@@ -119,11 +133,21 @@ struct FocusView: View {
                             ? Color.effectiveAccent.opacity(0.9)
                             : Color.white.opacity(0.12))
                         .frame(width: 13, height: barHeight(seconds: day.seconds, peak: peak))
-                        .help("\(day.seconds / 60) min")
                     Text(Self.weekdayFormatter.string(from: day.date))
                         .font(.system(size: 8, weight: .medium, design: .rounded))
                         .foregroundStyle(.gray)
                 }
+                .contentShape(Rectangle())
+                .onHover { hovering in
+                    if hovering {
+                        hoveredDayID = day.id
+                    } else if hoveredDayID == day.id {
+                        hoveredDayID = nil
+                    }
+                }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(Self.dayFormatter.string(from: day.date))
+                .accessibilityValue(durationText(seconds: day.seconds))
             }
         }
         .frame(height: 50, alignment: .bottom)
@@ -140,7 +164,21 @@ struct FocusView: View {
     }
 
     private var todayText: String {
-        let seconds = pomodoro.todayFocusSeconds
+        durationText(seconds: pomodoro.todayFocusSeconds)
+    }
+
+    private var hoveredDayText: String {
+        guard let hoveredDayID,
+              let day = pomodoro.lastSevenDays.first(where: { $0.id == hoveredDayID }) else {
+            return " "
+        }
+        let date = Calendar.current.isDateInToday(day.date)
+            ? "Today"
+            : Self.dayFormatter.string(from: day.date)
+        return "\(date) · \(durationText(seconds: day.seconds)) focused"
+    }
+
+    private func durationText(seconds: Int) -> String {
         let hours = seconds / 3600
         let minutes = (seconds % 3600) / 60
         return hours > 0 ? "\(hours)h \(minutes)m" : "\(minutes)m"
